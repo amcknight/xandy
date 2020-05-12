@@ -1,0 +1,43 @@
+name:                xandy
+version:             0.1.0.0
+github:              "amcknight/xandy"
+license:             BSD3
+author:              "Andrew McKnight"
+maintainer:          "thedonk@gmail.com"
+copyright:           "2020 Andrew McKnight"
+
+extra-source-files:
+- README.md
+- ChangeLog.md
+
+description:         Please see the README on GitHub at <https://github.com/amcknight/xandy#readme>
+
+dependencies:
+- base >= 4.7 && < 5
+- sbv
+- containers
+
+library:
+  source-dirs: src
+
+executables:
+  xandy-exe:
+    main:                Main.hs
+    source-dirs:         app
+    ghc-options:
+    - -threaded
+    - -rtsopts
+    - -with-rtsopts=-N
+    dependencies:
+    - xandy
+
+tests:
+  xandy-test:
+    main:                Spec.hs
+    source-dirs:         test
+    ghc-options:
+    - -threaded
+    - -rtsopts
+    - -with-rtsopts=-N
+    dependencies:
+    - xandy
