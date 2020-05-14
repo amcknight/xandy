@@ -1,8 +1,8 @@
-module Synth
+module AndNot.Synth
   ( synth
   ) where
 
-import Exp
+import AndNot.Exp
 import Data.Foldable (find)
 
 synth :: Exp -> Maybe Exp
@@ -38,4 +38,3 @@ check oracle e =
   if isEqual oracle e
   then Nothing
   else Just (CEx e)
-

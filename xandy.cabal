@@ -4,10 +4,10 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: de3c2e5f921bfcbc312fe47b4d6f6be622f51d15173efef8f9bbc46bfe02250c
+-- hash: 1322ddf3e6c06b55c6a099d302e599dd454fb39011b698287c18f6ea1532b36d
 
 name:           xandy
-version:        0.0.0.1
+version:        0.0.0.2
 description:    Please see the README on GitHub at <https://github.com/amcknight/xandy#readme>
 homepage:       https://github.com/amcknight/xandy#readme
 bug-reports:    https://github.com/amcknight/xandy/issues
@@ -27,9 +27,13 @@ source-repository head
 
 library
   exposed-modules:
-      Exp
-      Lib
-      Synth
+      AndNot.Exp
+      AndNot.Lib
+      AndNot.Synth
+      Lambda.Exp
+      Lambda.Lib
+      Lambda.Synth
+      Utils
   other-modules:
       Paths_xandy
   hs-source-dirs:

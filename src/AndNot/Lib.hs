@@ -1,8 +1,8 @@
 {-# LANGUAGE ScopedTypeVariables #-}
-module Lib (synthOr) where
+module AndNot.Lib (synthOr) where
 
-import Synth
-import Exp
+import AndNot.Synth
+import AndNot.Exp
 
 --quat :: IO SatResult
 --quat = sat . forAll ["x"] $ \(x::SWord8) -> x * 2 .== x + x
