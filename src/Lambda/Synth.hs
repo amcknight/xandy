@@ -31,6 +31,7 @@ allowed rs g = and (fmap (allowedOne g) rs)
 allowedOne :: Exp -> Constraint -> Bool
 allowedOne ex (CEx rEx) = ex /= rEx
 
+-- All programs that are functions with the right number of params and no unbound terms
 progs :: Int -> [Exp]
 progs n = filter bound $ allBinds =<< filter (isSig 1) (progShapes' =<< [1 .. n])
 
@@ -38,8 +39,6 @@ progShapes' :: Int -> [Exp]
 progShapes' 0 = [H]
 progShapes' n = (F <$> pn) ++ (A <$> pn <*> pn)
   where pn = progShapes' (n-1)
-
---(allBinds =<<
 
 isSig :: Int -> Exp -> Bool
 isSig 0 _ = True
@@ -62,7 +61,7 @@ guess rs = find (allowed rs) (progs maxDepth)
 check :: Exp -> Exp -> Result
 check oracle e =
   case isEqual oracle e of
-    Left err -> Error $ Unequalable $ "CANNAT DETERMINE EQUALITY because of: " ++ show err
+    Left (TooLong _) -> Con $ CEx e -- Isn't really a counter example, but we want to avoid this
     Right False -> Con $ CEx e
     Right True -> Success
 

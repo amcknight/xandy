@@ -4,10 +4,10 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 5c25f49dbfdc02bba54969d01b3423c33360698a95299aa7e72484dfe0b3561c
+-- hash: dd30abebffb8527d73e49e85137651d335fb9ee9c34600cc3cd734025008dcf2
 
 name:           xandy
-version:        0.0.0.2
+version:        0.0.1
 description:    Please see the README on GitHub at <https://github.com/amcknight/xandy#readme>
 homepage:       https://github.com/amcknight/xandy#readme
 bug-reports:    https://github.com/amcknight/xandy/issues

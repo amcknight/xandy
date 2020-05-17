@@ -1,5 +1,6 @@
 module Lambda.Exp
   ( Exp(..)
+  , Error(..)
   , eval
   , step
   , isEqual
@@ -16,9 +17,7 @@ data Exp = H
          | A Exp Exp
          deriving (Eq, Show)
 
-data Error = Empty
-           | TooLong Exp
-           deriving Show
+newtype Error = TooLong Exp deriving Show
 
 type Eval = Either Error Exp
 
