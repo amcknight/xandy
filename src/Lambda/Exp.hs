@@ -1,47 +1,79 @@
 module Lambda.Exp
   ( Exp(..)
   , eval
-  , vars
+  , step
   , isEqual
+  , bound
   ) where
 
-import Utils
+--import Data.Type.Nat
 
-type Var = Char
+type Var = Int
 
-data Exp = V Var
-         | F Var Exp
+data Exp = H
+         | V Var
+         | F Exp
          | A Exp Exp
          deriving (Eq, Show)
 
-eval :: Int -> Exp -> Maybe Exp
-eval 0 _ = Nothing
-eval _ (V c) = Just (V c)
-eval d (F v bod) = F v <$> eval (d-1) bod
-eval d (A f a) = do
-  ea <- eval (d-1) a
-  ef <- eval (d-1) f
+data Error = Empty
+           | TooLong Exp
+           deriving Show
+
+type Eval = Either Error Exp
+
+eval :: Exp -> Eval
+eval e = case eval' maxDepth e of
+  Nothing -> Left $ TooLong e
+  Just reducedE -> Right reducedE
+  where maxDepth = 10
+
+eval' :: Int -> Exp -> Maybe Exp
+eval' 0 _ = Nothing
+eval' _ H = Just H
+eval' _ (V i) = Just $ V i
+eval' d (F bod) = F <$> eval' (d-1) bod
+eval' d (A f a) = do
+  ea <- eval' (d-1) a
+  ef <- eval' (d-1) f
   case ef of
-    (F v bod) -> eval (d-1) (sub v ea bod)
+    (F bod) -> eval' (d-1) (sub ea bod)
     _ -> Just (A ef ea)
 
--- Assumes unique variables
--- Variable, Argument, Function Body -> Reduced Expression
-sub :: Var -> Exp -> Exp -> Exp
-sub param arg (V c)
-    | param == c = arg
-    | otherwise  = V c
-sub param arg (F v e) = F v (sub param arg e)
-sub param arg (A f a) = A (sub param arg f) (sub param arg a)
+step :: Exp -> Maybe Exp
+step H       = Nothing
+step (V _)   = Nothing
+step (F bod) = F <$> step bod
+step (A f a) =
+  case step f of
+    Just ef -> Just $ A ef a
+    Nothing -> case step a of
+      Just ea -> Just $ A f ea
+      Nothing -> case f of
+        F bod -> Just $ sub a bod
+        _ -> Nothing
 
-vars :: Exp -> String
-vars (V v) = [v]
-vars (F c e) = merge [c] (vars e)
-vars (A e1 e2) = merge (vars e1) (vars e2)
+-- Substitute the Argument into the Function Body
+sub :: Exp -> Exp -> Exp
+sub = sub' 1
 
-isEqual :: Exp -> Exp -> Maybe Bool
+-- De Brujin Index, Argument, Function Body -> Reduced Expression
+sub' :: Int -> Exp -> Exp -> Exp
+sub' _ _ H = H
+sub' index arg (V i)
+    | index == i = arg
+    | otherwise  = V i
+sub' index arg (F e) = F (sub' (index+1) arg e)
+sub' index arg (A f a) = A (sub' index arg f) (sub' index arg a)
+
+isEqual :: Exp -> Exp -> Either Error Bool
 isEqual e1 e2 = do
-  v1 <- eval maxDepth e1
-  v2 <- eval maxDepth e2
-  Just (v1 == v2)
-  where maxDepth = 10
+  v1 <- eval e1
+  v2 <- eval e2
+  Right (v1 == v2)
+
+bound :: Exp -> Bool
+bound H = False
+bound (V _) = True
+bound (F e) = bound e
+bound (A f a) = bound f && bound a

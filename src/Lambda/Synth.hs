@@ -6,42 +6,67 @@ import Lambda.Exp
 import Data.Foldable (find)
 import Control.Exception.Base (throw, Exception)
 
+newtype Constraint = CEx Exp
+
+data Result = Success
+            | Con Constraint
+            | Error Unequal
+
 synth :: Exp -> Maybe Exp
 synth oracle = synth' [CEx oracle] oracle
 
-synth' :: [Res] -> Exp -> Maybe Exp
-synth' rs oracle =
-  case guess rs (vars oracle) of
+synth' :: [Constraint] -> Exp -> Maybe Exp
+synth' cs oracle =
+  case guess cs of
     Nothing -> Nothing
     Just g ->
       case check oracle g of
-        Nothing -> Just g
-        Just r -> synth' (r:rs) oracle
+        Success -> Just g
+        Con c -> synth' (c:cs) oracle
+        Error err -> throw err
 
-newtype Res = CEx Exp
-
-allowed :: [Res] -> Exp -> Bool
+allowed :: [Constraint] -> Exp -> Bool
 allowed rs g = and (fmap (allowedOne g) rs)
 
-allowedOne :: Exp -> Res -> Bool
+allowedOne :: Exp -> Constraint -> Bool
 allowedOne ex (CEx rEx) = ex /= rEx
 
-progs :: Int -> String -> [Exp]
-progs 0 vs = V <$> vs
-progs n vs = progs (n-1) vs ++ (F <$> vs <*> progs (n-1) vs) ++ (A <$> progs (n-1) vs <*> progs (n-1) vs)
+progs :: Int -> [Exp]
+progs n = filter bound $ allBinds =<< filter (isSig 1) (progShapes' =<< [1 .. n])
 
-guess :: [Res] -> String -> Maybe Exp
-guess rs vs = find (allowed rs) (progs maxDepth vs)
+progShapes' :: Int -> [Exp]
+progShapes' 0 = [H]
+progShapes' n = (F <$> pn) ++ (A <$> pn <*> pn)
+  where pn = progShapes' (n-1)
+
+--(allBinds =<<
+
+isSig :: Int -> Exp -> Bool
+isSig 0 _ = True
+isSig n (F e) = isSig (n-1) e
+isSig _ _ = False
+
+allBinds :: Exp -> [Exp]
+allBinds = allBinds' 0
+
+allBinds' :: Int -> Exp -> [Exp]
+allBinds' mi H       = H : (V <$> [1..mi])
+allBinds' _  (V i)   = [V i]
+allBinds' mi (F e)   = F <$> allBinds' (mi+1) e
+allBinds' mi (A f a) = A <$> allBinds' mi f <*> allBinds' mi a
+
+guess :: [Constraint] -> Maybe Exp
+guess rs = find (allowed rs) (progs maxDepth)
   where maxDepth = 7
 
-check :: Exp -> Exp -> Maybe Res
+check :: Exp -> Exp -> Result
 check oracle e =
   case isEqual oracle e of
-    Nothing -> throw $ Unequal "CANNAT DETERMINE EQUALITY"
-    Just False -> Just (CEx e)
-    Just True -> Nothing
+    Left err -> Error $ Unequalable $ "CANNAT DETERMINE EQUALITY because of: " ++ show err
+    Right False -> Con $ CEx e
+    Right True -> Success
 
-newtype Unequal = Unequal String
+newtype Unequal = Unequalable String
 instance Exception Unequal
 instance Show Unequal where
-  show (Unequal s) = s
+  show (Unequalable s) = s

@@ -7,16 +7,19 @@ synthS :: Maybe Exp
 synthS = synth (stupid s)
 
 stupid :: Exp -> Exp
-stupid = A (F 's' (V 's'))
+stupid = A i
 
 s :: Exp
 s =
-  F 'a' (F 'b' (F 'c'
+  F (F (F
     (A
-      (A (V 'a') (V 'c'))
-      (A (V 'b') (V 'c'))
+      (A (V 3) (V 1))
+      (A (V 2) (V 1))
     )
   ))
 
 k :: Exp
-k = F 'l' (F 'r' (V 'l'))
+k = F (F (V 2))
+
+i :: Exp
+i = F (V 1)

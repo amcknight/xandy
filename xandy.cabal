@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 1322ddf3e6c06b55c6a099d302e599dd454fb39011b698287c18f6ea1532b36d
+-- hash: 5c25f49dbfdc02bba54969d01b3423c33360698a95299aa7e72484dfe0b3561c
 
 name:           xandy
 version:        0.0.0.2
@@ -41,6 +41,7 @@ library
   build-depends:
       base >=4.7 && <5
     , containers
+    , fin
     , sbv
   default-language: Haskell2010
 
@@ -54,6 +55,7 @@ executable xandy-exe
   build-depends:
       base >=4.7 && <5
     , containers
+    , fin
     , sbv
     , xandy
   default-language: Haskell2010
@@ -69,6 +71,7 @@ test-suite xandy-test
   build-depends:
       base >=4.7 && <5
     , containers
+    , fin
     , sbv
     , xandy
   default-language: Haskell2010
