@@ -1,5 +1,9 @@
 # Changelog for xandy
 
+### Unreleased
+* Separated CEGIS from BruteSearch which gave a quadratic speedup (S synthesized in 60ms now)
+* Y Combinator still not synthesizable
+
 ### v0.0.1
 * Can synthesize SKI combinators from lambda calulus, including S in ~20s
 * Uses de Brujin indices to prevent checkingof isomorphic programs

@@ -1,6 +1,6 @@
 module Main where
 
-import AndNot.Lib
+import Lambda.Lib
 
 main :: IO ()
-main = print synthOr
+main = print synthS

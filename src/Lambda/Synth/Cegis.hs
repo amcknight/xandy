@@ -1,8 +1,11 @@
-module Lambda.Synth
+module Lambda.Synth.Cegis
   ( synth
   ) where
 
 import Lambda.Exp
+import Lambda.Peano
+import Lambda.Eval
+import Lambda.Progs
 import Data.Foldable (find)
 import Control.Exception.Base (throw, Exception)
 
@@ -31,32 +34,9 @@ allowed rs g = and (fmap (allowedOne g) rs)
 allowedOne :: Exp -> Constraint -> Bool
 allowedOne ex (CEx rEx) = ex /= rEx
 
--- All programs that are functions with the right number of params and no unbound terms
-progs :: Int -> [Exp]
-progs n = filter bound $ allBinds =<< filter (isSig 1) (progShapes' =<< [1 .. n])
-
-progShapes' :: Int -> [Exp]
-progShapes' 0 = [H]
-progShapes' n = (F <$> pn) ++ (A <$> pn <*> pn)
-  where pn = progShapes' (n-1)
-
-isSig :: Int -> Exp -> Bool
-isSig 0 _ = True
-isSig n (F e) = isSig (n-1) e
-isSig _ _ = False
-
-allBinds :: Exp -> [Exp]
-allBinds = allBinds' 0
-
-allBinds' :: Int -> Exp -> [Exp]
-allBinds' mi H       = H : (V <$> [1..mi])
-allBinds' _  (V i)   = [V i]
-allBinds' mi (F e)   = F <$> allBinds' (mi+1) e
-allBinds' mi (A f a) = A <$> allBinds' mi f <*> allBinds' mi a
-
 guess :: [Constraint] -> Maybe Exp
 guess rs = find (allowed rs) (progs maxDepth)
-  where maxDepth = 7
+  where maxDepth = toPeano 10
 
 check :: Exp -> Exp -> Result
 check oracle e =

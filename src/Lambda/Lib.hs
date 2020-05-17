@@ -1,7 +1,8 @@
 module Lambda.Lib (synthS) where
 
-import Lambda.Synth
+import Lambda.Synth.BruteSearch
 import Lambda.Exp
+import Lambda.Peano
 
 synthS :: Maybe Exp
 synthS = synth (stupid s)
@@ -13,13 +14,20 @@ s :: Exp
 s =
   F (F (F
     (A
-      (A (V 3) (V 1))
-      (A (V 2) (V 1))
+      (A (V three) (V one))
+      (A (V two) (V one))
     )
   ))
 
 k :: Exp
-k = F (F (V 2))
+k = F (F (V two))
 
 i :: Exp
-i = F (V 1)
+i = F (V one)
+
+y :: Exp
+y =
+  F (A
+    (F (A (V two) (A (V one) (V one))))
+    (F (A (V two) (A (V one) (V one))))
+  )

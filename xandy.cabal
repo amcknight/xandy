@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: dd30abebffb8527d73e49e85137651d335fb9ee9c34600cc3cd734025008dcf2
+-- hash: 90f812b106d4ab1538a278e2026cdd9570c184eb75675392e82f9107437ed914
 
 name:           xandy
 version:        0.0.1
@@ -30,9 +30,13 @@ library
       AndNot.Exp
       AndNot.Lib
       AndNot.Synth
+      Lambda.Eval
       Lambda.Exp
       Lambda.Lib
-      Lambda.Synth
+      Lambda.Peano
+      Lambda.Progs
+      Lambda.Synth.BruteSearch
+      Lambda.Synth.Cegis
       Utils
   other-modules:
       Paths_xandy
