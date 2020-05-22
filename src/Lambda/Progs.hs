@@ -4,15 +4,25 @@ module Lambda.Progs
 
 import Lambda.Exp
 import Lambda.Peano
+import Lambda.Eval
+import Data.List (nub)
 
 -- All programs that are functions with the right number of params and no unbound terms
 progs :: Peano -> [Exp]
-progs n = filter isBound $ allBinds =<< filter (isSig one) (progShapes' =<< range one n)
+progs n = filter isBound $ allBinds =<< filter (isSig one) (progShapes' =<< (toInt <$> range one n))
 
-progShapes' :: Peano -> [Exp]
-progShapes' Z = [H]
-progShapes' (S p) = (F <$> subShapes) ++ (A <$> subShapes <*> subShapes)
-  where subShapes = progShapes' p
+progShapes' :: Int -> [Exp]
+progShapes' 0 = [H]
+progShapes' n
+    | n < 0 = []
+    | n > 0 = (F <$> progShapes' m) ++ concatMap ps [0..m]
+  where ps i = A <$> progShapes' i <*> progShapes' (m-i-1)
+        m = n-1
+
+isBetaNormal :: Exp -> Bool
+isBetaNormal e = case step e of
+  Nothing -> True
+  _ -> False
 
 isSig :: Peano -> Exp -> Bool
 isSig Z _ = True
